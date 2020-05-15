@@ -1,7 +1,7 @@
 ---
 title: Catalan Number
 date: 2020-05-15 01:35:50
-tags:
+tags: Algorithm
 categories:
 cover: https://helloacm.com/wp-content/uploads/2019/12/catalan-numbers-applications.jpg
 ---
