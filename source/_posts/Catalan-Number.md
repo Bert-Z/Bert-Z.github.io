@@ -32,12 +32,12 @@ a(n)=a(0)×a(n-1)+a(1)*a(n-2)+...+a(n-1)*a(0)
 卡特兰数的通项是 c(2n, n)/(n+1)。
 
 
-
-
-
 注意组合数学中的运算：A(m, n) = m! / (m-n)!,   C(m, n) = A(m, n) / n! = m! / ((m-n)!*n!),因此卡特兰数的通项：
 
 ​     C(2n, n)/(n+1) = (2n!) / ((2n - n)! * n!)  / (n + 1) = (2n!) / (n! * n!) / (n + 1)
+
+
+=> ![img](https://wikimedia.org/api/rest_v1/media/math/render/svg/15115359a55c1ff29d7d56b61bd5c824e7c6b668)
 
 
 
