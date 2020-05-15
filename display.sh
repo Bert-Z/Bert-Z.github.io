@@ -1,4 +1,4 @@
 #!/bin/bash
-hexo clean 
+# hexo clean 
 hexo g
 hexo s
