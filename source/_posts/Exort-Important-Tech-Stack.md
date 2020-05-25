@@ -47,4 +47,4 @@ cover: https://i.pinimg.com/474x/69/73/76/6973766435a3a5b50985ba9795c7f8cb.jpg
 
 ## CI / CD 
 
-用之前在服务器上搭的drone做CI CD。
+用之前在服务器上搭的drone做CI/CD.
