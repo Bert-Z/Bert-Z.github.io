@@ -3,7 +3,7 @@ title: '[转载]【C++基础之十】友元函数和友元类'
 date: 2020-05-30 08:30:29
 tags: Cpp
 categories:
-cover: https://lh3.googleusercontent.com/proxy/cYtKJmo5kBBjFFusOYKKWSbHaiLI5Fw0RwWg1xLH-KgsqW473o1utcIZw3hwvtOjDGBksOdJd-mfhxaemNwsZZPbppUNBlrcKyUZZyC214bwmzJ81yudkkKDMIt6r_tUfJSWnXo_GIT2Gp3Zmpo
+cover: https://img-blog.csdnimg.cn/20190618214113419.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2ZlaXQyNDE3,size_16,color_FFFFFF,t_70
 ---
 <meta name="referrer" content="no-referrer" />
 
