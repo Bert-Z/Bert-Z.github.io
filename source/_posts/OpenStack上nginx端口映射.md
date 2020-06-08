@@ -1,7 +1,7 @@
 ---
 title: OpenStack上nginx端口映射
 date: 2020-06-05 15:21:57
-tags: Nginx
+tags: [Config,Nginx,Docker]
 categories:
 cover: /images/nginx/nginx.png
 ---
