@@ -97,17 +97,16 @@ std::mutex m;
 void t1()
 {
     while (cnt > 0)
-    {    
+    {
         std::lock_guard<std::mutex> lockGuard(m);
-       // std::m.lock();
+        // std::m.lock();
         if (cnt > 0)
         {
             //sleep(1);
             --cnt;
-            std::cout << cnt << std::endl;
+            std::cout << "1:" << cnt << std::endl;
         }
-       // std::m.unlock();
-        
+        // std::m.unlock();
     }
 }
 void t2()
@@ -119,7 +118,7 @@ void t2()
         if (cnt > 0)
         {
             --cnt;
-            std::cout << cnt << std::endl;
+            std::cout << "2:" << cnt << std::endl;
         }
         // std::m.unlock();
     }
@@ -127,40 +126,40 @@ void t2()
 
 int main(void)
 {
-	std::thread th1(t1);
-	std::thread th2(t2);
+    std::thread th1(t1);
+    std::thread th2(t2);
 
-	th1.join();    //等待t1退出
-	th2.join();    //等待t2退出
-	 
-	std::cout << "here is the main()" << std::endl;
-	 
-	return 0;
+    th1.join(); //等待t1退出
+    th2.join(); //等待t2退出
+
+    std::cout << "here is the main()" << std::endl;
+
+    return 0;
 }
 ```
 
 输出结果，cnt是依次递减的，没有因为多线程而打乱次序：：
 
 ```shell
-19
-18
-17
-16
-15
-14
-13
-12
-11
-10
-9
-8
-7
-6
-5
-4
-3
-2
-1
-0
+1:19
+1:18
+1:17
+1:16
+1:15
+1:14
+1:13
+1:12
+1:11
+1:10
+1:9
+1:8
+1:7
+1:6
+1:5
+1:4
+1:3
+1:2
+1:1
+1:0
 here is the main()
 ```
