@@ -1,0 +1,265 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[转载]Linux上C++类的动态加载 | Bert Zhang</title><meta name="description" content="1. 前言一种可以让开发者进行更灵活设计的技术。 Linux操作系统下的开发平台提供了很好的环境：自带丰富的测试工具，健壮的操作环境。令Linux引以为豪的是，它能适应各种编程语言。下面的说法，相信并不为过：对Linux开发者来，在所有的编译语言中，选择C作为开发语言是最多的。由此，像C++这样的语言似乎经常不在Linux开发者的讨论范围内。 类的动态加载技术可以让开发者的设计更灵活。类的动态"><meta name="keywords" content="Cpp"><meta name="author" content="Bert Zhang,wanqiangzhang@sjtu.edu.cn"><meta name="copyright" content="Bert Zhang"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://fonts.googleapis.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="dns-prefetch" href="//busuanzi.ibruce.info"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="[转载]Linux上C++类的动态加载"><meta name="twitter:description" content="1. 前言一种可以让开发者进行更灵活设计的技术。 Linux操作系统下的开发平台提供了很好的环境：自带丰富的测试工具，健壮的操作环境。令Linux引以为豪的是，它能适应各种编程语言。下面的说法，相信并不为过：对Linux开发者来，在所有的编译语言中，选择C作为开发语言是最多的。由此，像C++这样的语言似乎经常不在Linux开发者的讨论范围内。 类的动态加载技术可以让开发者的设计更灵活。类的动态"><meta name="twitter:image" content="https://blog-1251688504.cos.ap-shanghai.myqcloud.com/201906/fake_dlopen_flow.png"><meta property="og:type" content="article"><meta property="og:title" content="[转载]Linux上C++类的动态加载"><meta property="og:url" content="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E4%B8%8AC-%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/"><meta property="og:site_name" content="Bert Zhang"><meta property="og:description" content="1. 前言一种可以让开发者进行更灵活设计的技术。 Linux操作系统下的开发平台提供了很好的环境：自带丰富的测试工具，健壮的操作环境。令Linux引以为豪的是，它能适应各种编程语言。下面的说法，相信并不为过：对Linux开发者来，在所有的编译语言中，选择C作为开发语言是最多的。由此，像C++这样的语言似乎经常不在Linux开发者的讨论范围内。 类的动态加载技术可以让开发者的设计更灵活。类的动态"><meta property="og:image" content="https://blog-1251688504.cos.ap-shanghai.myqcloud.com/201906/fake_dlopen_flow.png"><meta property="article:published_time" content="2020-07-23T07:45:48.000Z"><meta property="article:modified_time" content="2020-07-23T07:47:13.224Z"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="canonical" href="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E4%B8%8AC-%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/"><link rel="next" title="[转载]Linux动态库生成与使用指南" href="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"cookieDomain":"https://xxx/","msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  bookmark: {
+    message_prev: 'Press',
+    message_next: 'to bookmark this page'
+  },
+  runtime_unit: 'days',
+  runtime: true,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: true  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 4.2.0"></head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://avatars0.githubusercontent.com/u/33542391?s=460&amp;u=db2ad59370788a7d3c85017aec44089206bd9494&amp;v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">Articles</div><div class="length_num">35</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">Tags</div><div class="length_num">16</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div></div></div><i class="fa fa-arrow-right on" id="toggle-sidebar" aria-hidden="true">     </i><div id="sidebar"><div class="sidebar-toc"><div class="sidebar-toc__title">Catalog</div><div class="sidebar-toc__progress"><span class="progress-notice">You've read</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-前言"><span class="toc-number">1.</span> <span class="toc-text">1. 前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-多态"><span class="toc-number">2.</span> <span class="toc-text">2. 多态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-dlopen接口和类的动态加载"><span class="toc-number">3.</span> <span class="toc-text">3. dlopen接口和类的动态加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-自动注册"><span class="toc-number">4.</span> <span class="toc-text">4. 自动注册</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-应用案例"><span class="toc-number">5.</span> <span class="toc-text">5. 应用案例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-结论"><span class="toc-number">6.</span> <span class="toc-text">6. 结论</span></a></li></ol></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://blog-1251688504.cos.ap-shanghai.myqcloud.com/201906/fake_dlopen_flow.png)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">Bert Zhang</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">[转载]Linux上C++类的动态加载</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date"><span class="post-meta__date-created" title="Created 2020-07-23 07:45:48"><i class="fa fa-calendar" aria-hidden="true"></i> Created 2020-07-23</span><span class="post-meta__separator">|</span><span class="post-meta__date-updated" title="Updated 2020-07-23 07:47:13"><i class="fa fa-history" aria-hidden="true"></i> Updated 2020-07-23</span></time></div><div class="meta-secondline"> </div><div class="meta-thirdline"><span class="post-meta-pv-cv"><i class="fa fa-eye post-meta__icon" aria-hidden="true"> </i><span>Post View:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-commentcount"></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+<h3 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h3><p><em>一种可以让开发者进行更灵活设计的技术。</em></p>
+<p>Linux操作系统下的开发平台提供了很好的环境：自带丰富的测试工具，健壮的操作环境。令Linux引以为豪的是，它能适应各种编程语言。下面的说法，相信并不为过：对Linux开发者来，在所有的编译语言中，选择C作为开发语言是最多的。由此，像C++这样的语言似乎经常不在Linux开发者的讨论范围内。</p>
+<p>类的动态加载技术可以让开发者的设计更灵活。类的动态加载可以使实现更具扩展性，而不牺牲鲁棒性。</p>
+<p>本文将设计一个简单的应用，这个应用只有一个类：用于绘图包的形状类。我们将会看到，类的动态加载技术可以让我们平滑地扩展功能——增加新的形状类而不修改原有代码。</p>
+<h3 id="2-多态"><a href="#2-多态" class="headerlink" title="2. 多态"></a>2. 多态</h3><p>动态加载类的基本思想就是类的多态性。任何熟悉C++的人对此都不会陌生，这里就只简洁地说明一下。总的来说，多态，就是子类对象可以像父类对象的那样表现。这就是OOP（object-oriented programming，面向对象）中众所周知的“<strong>is a</strong>”关系。比如，下面的代码段中，类<strong>circle</strong>“is a”基类<strong>shape</strong>的子类（见列表1），因而对象<strong>my_circle</strong>可以像shape对象一样操作shape的成员函数<strong>draw</strong>。</p>
+<p><strong>列表1 基类shape的头文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class shape &#123;</span><br><span class="line">public:</span><br><span class="line">  void draw();</span><br><span class="line">&#125;;</span><br><span class="line">class circle : public shape &#123; &#125;;</span><br><span class="line"> </span><br><span class="line">int main(int argc, char **argv)&#123;</span><br><span class="line">  circle my_circle;</span><br><span class="line">  my_circle.draw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这包括所有的常规优点（如代码复用）以外，多态性的真正优势在于draw声明为虚函数或者纯虚函数的时候，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">class shape&#123;</span><br><span class="line">public:</span><br><span class="line">  virtual void draw()&#x3D;0;</span><br><span class="line">&#125;;</span><br><span class="line">class circle : public shape &#123;</span><br><span class="line">public:</span><br><span class="line">  void draw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>这里circle定义了自己的draw函数，以确保circle对象有正确的行为。同样，我们可以定义一些新的shape子类，并重写draw函数。这样，全部的子类都实现了shape的接口，进而可以创建一系列表现不同的对象，这些对象都调用同一个方法（调用draw成员函数）。下面是例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">shape *shape_list[3];   &#x2F;&#x2F; the array that will</span><br><span class="line">                            &#x2F;&#x2F; pointer to our shape objects</span><br><span class="line">shape[0] &#x3D; new circle;  &#x2F;&#x2F; three types of shapes</span><br><span class="line">shape[1] &#x3D; new square;  &#x2F;&#x2F; we have defined</span><br><span class="line">shape[2] &#x3D; new triangle;</span><br><span class="line">for(int i &#x3D; 0; i &lt; 3; i++)&#123;</span><br><span class="line">  shape_list[i].draw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>调用draw函数时，并不需要知道列表中对象的其他信息；C++会正确地调用对应的draw函数。这种强大的技术可以让我们的设计更灵活。现在我们可以通过继承shape来实现我们期望的行为。这里的关键是我们可以把接口（shape的原型）和实现分开。</p>
+<p>虽然此技术相当强大，但如果我们想添加新的继承函数的话，我们仍不得不重新编译代码。如果能够在运行时加载新类，那将会非常方便。而且，使用我们代码库的人完全可以提供新的形状类（重写draw函数）而不必需要我们的原始代码。好消息是，这是可能的，这也是本文讨论的主题。</p>
+<h3 id="3-dlopen接口和类的动态加载"><a href="#3-dlopen接口和类的动态加载" class="headerlink" title="3. dlopen接口和类的动态加载"></a>3. dlopen接口和类的动态加载</h3><p>虽然Linux下还没有直接的机制可以在运行时加载C++类，但是有一个直接在运行时加载C库的机制：dl函数<strong>dlopen</strong>，<strong>dlsym</strong>，<strong>dlerror</strong>和<strong>dlclose</strong>。这组函数提供了访问动态链接器ld的方法。完整的说明可以参考这些函数的man手册，这里仅简要说明。</p>
+<p>函数原型如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void *dlopen(const char * filename, int flag);</span><br><span class="line">void *dlsym(void *handle, char*symbol);</span><br><span class="line">const char *dlerror();</span><br><span class="line">int dlclose(void *handle);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>dlopen函数通过文件名filename打开so文件，文件中的符号通过dlsym函数读取。参数flag可以取下面的值：<strong>RTLD_LAZY</strong>和<strong>RTLD_NOW</strong>。如果flag设置为RTLD_LAZY，那么dlopen会不解析任何符号就返回。如果<strong>flag</strong>设置为<strong>RTLD_NOW</strong>，那么dlopen会尝试解析文件中所有未定义的符号。如果出现解析错误，函数调用失败，返回NULL。dlerror解析失败的原因。dlsym函数用于读取库中函数（或其他符号）的指针。<strong>handle</strong>是指向被引用项的指针，<strong>symbol</strong>是被引用项在实际保存文件中的字符串名字。</p>
+<p>假如可以通过这些函数访问C库里的函数，要样才能利用它们访问C++库？要达到这个目的，有几个问题需要解决。一个是必须能够定位到目标库函数的符号。由于C和C++文件中保存的符号是不一样的，导致解决这个问题会比看起来麻烦一些。另一个问题是要如何创建目标类的对象？最后，访问这些对象的便捷方法又是什么？下面将反过来回答这三个问题。</p>
+<p>因为并不知道动态加载的类的类型，在代码中应该如何访问？答案的诀窍在于前面提到的多态。可以通过基类提供的公用接口来使用新类的功能。延续上面的例子，新的shape类会重写draw函数，并在实际的对象中正确调用自己的draw函数。</p>
+<p>好，现在可以通过基类的指针访问子类的对象了。怎样在开始的地方创建这些对象？除了知道它们可以调用shape的接口外，并不知道目标类的其他相关信息。举个例子，假如动态地加载了一个库，这个库中有个类<strong>hexapod</strong>，如果不能提前知道类名，不能这样写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shape *my_shape &#x3D; new hexapod;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>解决办法是，主程序不负责创建对象，至少不是直接创建。库中提供的shape子类必须提供一个创建对象的方法。这个可以用<strong>工厂类</strong>来实现，就像工厂模式那样，或者直接调用一个函数创建。为了简化说明，这里直接用一个函数来创建。所有形状类的函数返回值都一样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shape *maker();</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>maker</strong>函数没有参数，返回构建成功的对象指针。针对前面的hexapod类，maker函数如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shape *maker()&#123;</span><br><span class="line">  return new hexapod;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>使用<strong>new</strong>来创建新的对象是绝对合法的，因为maker函数和hexapod定义是在同一个文件中。</p>
+<p>现在，先用dlopen加载一个库，然后用dlsym得到对应类的maker函数指针。使用这个指针创建对应类的对象。例，假如想要动态链接库libnewshapes.so，并应用其中的hexapod类。可以像这样子进行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void *hndl &#x3D;dlopen(&quot;libnewshapes.so&quot;, RTLD_NOW);</span><br><span class="line">if(hndl &#x3D;&#x3D; NULL)&#123;</span><br><span class="line">  cerr &lt;&lt; dlerror() &lt;&lt; endl;</span><br><span class="line">  exit(-1);</span><br><span class="line">&#125;</span><br><span class="line">void *mkr &#x3D; dlsym(hndl,&quot;maker&quot;);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>指向maker的指针必须是<strong>void*</strong>类型的，因为dlsym返回的就是这个类型。现在，可以通过调用<strong>mkr</strong>创建hexapod类的对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shape *my_shape &#x3D; static_cast&lt;shape*()&gt;(mkr)();</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>调用时要记得将mkr的返回强制转换成shape*类型。</p>
+<p>读到这里，可能有读者发现代码有个问题：调用dlsym可能失败了，无法解析“maker”。这个问题根源在于C++为了实现重载，把函数名改了，因而库中的maker函数可能变了。可以通过解析改名的规则来找到改过名的符号，不过有一个更简单的方法。只需要用extern “C”标识来告诉编译器使用C风格的链接包，如下所示：</p>
+<p><strong>列表 2. 类circle的头文件和源文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">#ifndef __CIRCLE_H</span><br><span class="line">#define __CIRCLE_H</span><br><span class="line">#include &quot;shape.hh&quot;</span><br><span class="line">class circle : public shape &#123;</span><br><span class="line">public:</span><br><span class="line">  void draw();</span><br><span class="line">&#125;;</span><br><span class="line">#endif &#x2F;&#x2F; __CIRCLE_H</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">#include &lt;iostream&gt; #include&quot;circle.hh&quot;</span><br><span class="line">void circle::draw()&#123;</span><br><span class="line">  &#x2F;&#x2F; simple ascii circle</span><br><span class="line">  cout &lt;&lt; &quot;</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;     ****</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *      *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;   *        *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;   *        *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;   *        *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *      *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;     ****</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;</span><br><span class="line">&quot;;</span><br><span class="line">&#125;</span><br><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line">shape *maker()&#123;</span><br><span class="line">  return new circle;</span><br><span class="line">&#125;</span><br><span class="line">class proxy &#123;</span><br><span class="line">public:</span><br><span class="line">  proxy()&#123;</span><br><span class="line">     &#x2F;&#x2F; register the maker with the factory</span><br><span class="line">     factory[&quot;circle&quot;] &#x3D; maker;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&#x2F;&#x2F; our one instance of the proxy</span><br><span class="line">proxy p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="4-自动注册"><a href="#4-自动注册" class="headerlink" title="4. 自动注册"></a>4. 自动注册</h3><p>可以将maker函数载入到一个专门存放maker函数的数组中。不过，用更灵活的关联数组来保存maker函数在某些情况下或许会更有用。可以用标准模板库(Standard Template Library , <a href="http://www.it165.net/pro/" target="_blank" rel="noopener">STL</a>)中的map类，通过键关联到maker函数，就能根据键值来访问。例如，给各个类命名，并通过名字来调用合适的maker函数。本例中，建立如下映射：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">typedef shape *maker_ptr();</span><br><span class="line">map &lt;string, maker_ptr&gt; factory;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>现在，要创建一个指定的形状时，可以通过形状的名称调用合适的maker函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shape *my_shape &#x3D; factory[</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>还可以把这种技术扩展得更灵活。载入类的maker函数时，与其显式地赋值，何不让类的设计者来做这个事？稍微费点心思，让工厂方法自动注册maker函数，这样能让类设计者自由确定名字。（这里有两个忠告：所有的键类型必须相同，绝对不能出现重复的键。）</p>
+<p>完成这个工作的第一步是，每个形状库必须包含maker函数，并且每次打开时，都调用这个函数。（通过dlopen的man手册可以知道，如果库定义导出了一个_init函数，那么库每次打开的时候都会调用它。这看起来是一个注册maker函数的好地方，不幸的是目前在linux系统上不能正常工作。问题在于一个标准的链接对象文件crt.o导出了一个__init函数，这就导致了冲突。）至此，我们延续了这个函数名，这个机制仍正常工作。我个人赞成摒弃那种方法，更希望采用一打开库就能注册maker函数的方法。这种方法就是Jim Beveridge引入的著名的“自注册对象”（参考文献）。</p>
+<p>可以创建一个代理类单例用于注册maker函数。注册过程会在类的构建函数中进行，因而只需要创建一个代理类实例来处理这件事。这个类的原型如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">class proxy &#123;</span><br><span class="line">public:</span><br><span class="line">  proxy()&#123;</span><br><span class="line">     factory[&quot;shape name&quot;] &#x3D; maker;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>这里假设工厂实例是主程序里定义导出的全局map实例。使用gcc/egcs，可以设置rdynamic选项来强制主程序导出能够用dlopen函数载入的符号表。</p>
+<p>下一步，只定义一个代理实例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxy p;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>现在，打开库时，传参数RTLD_NOW给dlopen函数，p就会被实例化，并注册目标的maker函数。如果想创建一个circle，可以这样调用circle的maker函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shape *my_circle &#x3D;factory[&quot;circle&quot;];</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>自动注册处理是非常强大的，利用这个功能设计出的主程序也能支持信息缺乏的类。例如，主程序动态载入了某个形状库之后，通过工厂实例里注册的键，就能够创建一个形状选择菜单。用户从菜单列表中选择”circle”，程序就立刻能调用正确的maker函数。这里，circle类已经支持shape的API，并且maker函数也正确定义了，所以主程序根本不需要其它的信息。</p>
+<p><strong>列表 3. 类Square的头文件和源文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">#ifndef __SQUARE_H</span><br><span class="line">#define __SQUARE_H</span><br><span class="line">#include &quot;shape.hh&quot;</span><br><span class="line">class square : public shape &#123;</span><br><span class="line">public:</span><br><span class="line">  void draw();</span><br><span class="line">&#125;;</span><br><span class="line">#endif &#x2F;&#x2F; __SQUARE_H</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &quot;square.hh&quot;</span><br><span class="line">void square::draw()&#123;</span><br><span class="line">  &#x2F;&#x2F; simple ascii square</span><br><span class="line">  cout &lt;&lt; &quot;</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;   *********</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *       *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *       *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *       *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;    *       *</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;   *********</span><br><span class="line">&quot;;</span><br><span class="line">  cout &lt;&lt; &quot;</span><br><span class="line">&quot;;</span><br><span class="line">&#125;</span><br><span class="line">extern &quot;C&quot; &#123;</span><br><span class="line">shape *maker()&#123;</span><br><span class="line">  return new square;</span><br><span class="line">&#125;</span><br><span class="line">class proxy &#123;</span><br><span class="line">public:</span><br><span class="line">  proxy()&#123;</span><br><span class="line">     &#x2F;&#x2F; register the maker with the factory</span><br><span class="line">     factory[&quot;square&quot;] &#x3D; maker;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&#x2F;&#x2F; our one instance of the proxy</span><br><span class="line">proxy p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>到这里，把列表1到列表5放到一起，相关的概念已经清晰了。列表1的shape类是所有形状类的基类。列表2和列表3分别是circle类和square类的源代码，它们支持库的动态加载。</p>
+<p><strong>列表 4. 主程序代码，调用可以动态载入的类circle和类square</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;map&gt;</span><br><span class="line">#include &lt;list&gt;</span><br><span class="line">#include &lt;vector&gt;</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">#include &lt;dlfcn.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &quot;shape.hh&quot;</span><br><span class="line">&#x2F;&#x2F; size of buffer for reading indirectory entries</span><br><span class="line">static unsigned int BUF_SIZE &#x3D; 1024;</span><br><span class="line">&#x2F;&#x2F; our global factory for making shapes</span><br><span class="line">map&lt;string, maker_t *,less&lt;string&gt; &gt; factory;</span><br><span class="line">int main(int argc, char **argv)&#123;</span><br><span class="line">  FILE *dl;   &#x2F;&#x2F; handle to readdirectory</span><br><span class="line">  char *command_str &#x3D; &quot;ls *.so&quot;; &#x2F;&#x2F; command</span><br><span class="line">               &#x2F;&#x2F; string to get dynamic libnames</span><br><span class="line">  char in_buf[BUF_SIZE]; &#x2F;&#x2F; input buffer for lib</span><br><span class="line">                          &#x2F;&#x2F; names</span><br><span class="line">  list&lt;void *&gt; dl_list; &#x2F;&#x2F; list to hold handles</span><br><span class="line">                               &#x2F;&#x2F; for dynamiclibs</span><br><span class="line">  list&lt;void *&gt;::iterator itr;</span><br><span class="line">vector&lt;string&gt; shape_names;  &#x2F;&#x2F; vector of shape</span><br><span class="line">               &#x2F;&#x2F; types used to build menu</span><br><span class="line">  list&lt;shape *&gt; shape_list; &#x2F;&#x2F; list of shape</span><br><span class="line">               &#x2F;&#x2F; objects we create</span><br><span class="line">  list&lt;shape *&gt;::iterator sitr;</span><br><span class="line">map&lt;string, maker_t *,less&lt;string&gt; &gt;::iterator fitr;</span><br><span class="line">  &#x2F;&#x2F; get the names of all the dynamic libs (.so</span><br><span class="line">              &#x2F;&#x2F; files) in the current dir</span><br><span class="line">  dl &#x3D; popen(command_str, &quot;r&quot;);</span><br><span class="line">  if(!dl)&#123;</span><br><span class="line">     perror(&quot;popen&quot;);</span><br><span class="line">     exit(-1);</span><br><span class="line">  &#125;</span><br><span class="line">  void *dlib;</span><br><span class="line">  char name[1024];</span><br><span class="line">  while(fgets(in_buf, BUF_SIZE, dl))&#123;</span><br><span class="line">     &#x2F;&#x2F; trim off the whitespace</span><br><span class="line">     char *ws &#x3D; strpbrk(in_buf, &quot; 	</span><br><span class="line">&quot;);</span><br><span class="line">     if(ws) *ws &#x3D; &#39;&#39;;</span><br><span class="line">     &#x2F;&#x2F; append .&#x2F; to the front of the lib name</span><br><span class="line">     sprintf(name, &quot;.&#x2F;%s&quot;, in_buf);</span><br><span class="line">     dlib &#x3D; dlopen(name, RTLD_NOW);</span><br><span class="line">     if(dlib &#x3D;&#x3D; NULL)&#123;</span><br><span class="line">        cerr &lt;&lt; dlerror() &lt;&lt; endl;</span><br><span class="line">        exit(-1);</span><br><span class="line">     &#125;</span><br><span class="line">     &#x2F;&#x2F; add the handle to our list</span><br><span class="line">     dl_list.insert(dl_list.end(), dlib);</span><br><span class="line">  &#125;</span><br><span class="line">  int i &#x3D; 0;</span><br><span class="line">  &#x2F;&#x2F; create an array of the shape names</span><br><span class="line">  for(fitr&#x3D;factory.begin(); fitr!&#x3D;factory.end();</span><br><span class="line">       fitr++)&#123;</span><br><span class="line">     shape_names.insert(shape_names.end(),</span><br><span class="line">       fitr-&gt;first);</span><br><span class="line">     i++;</span><br><span class="line">  &#125;</span><br><span class="line">  int choice;</span><br><span class="line">  &#x2F;&#x2F; create a menu of possible shapes to create and let the user make some</span><br><span class="line">  while(1)&#123;</span><br><span class="line">     i &#x3D; 1;</span><br><span class="line">     for(fitr&#x3D;factory.begin();</span><br><span class="line">           fitr!&#x3D;factory.end(); fitr++)&#123;</span><br><span class="line">        cout &lt;&lt; i &lt;&lt; &quot; - Create &quot; &lt;&lt; fitr-&gt;first</span><br><span class="line">            &lt;&lt; endl;</span><br><span class="line">        i++;</span><br><span class="line">     &#125;</span><br><span class="line">     cout &lt;&lt; i &lt;&lt; &quot; - Draw created shapes</span><br><span class="line">&quot;;</span><br><span class="line">     i++; i</span><br><span class="line">     cout &lt;&lt; i &lt;&lt; &quot; - Exit</span><br><span class="line">&quot;;</span><br><span class="line">     cout &lt;&lt; &quot;&gt; &quot;;</span><br><span class="line">     cin &gt;&gt; choice;</span><br><span class="line">     if(choice &#x3D;&#x3D; i)&#123;</span><br><span class="line">        &#x2F;&#x2F; destroy any shapes we created</span><br><span class="line">        for(sitr&#x3D;shape_list.begin();</span><br><span class="line">              sitr!&#x3D;shape_list.end();sitr++)&#123;</span><br><span class="line">            delete *sitr;</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F; close all the dynamic libs we opened</span><br><span class="line">        for(itr&#x3D;dl_list.begin(); itr!&#x3D;dl_list.end(); itr++)&#123;</span><br><span class="line">           dlclose(*itr);</span><br><span class="line">        &#125;</span><br><span class="line">        exit(1);</span><br><span class="line">     &#125;</span><br><span class="line">     if(choice &#x3D;&#x3D; i - 1)&#123;</span><br><span class="line">        &#x2F;&#x2F; draw the shapes</span><br><span class="line">        for(sitr&#x3D;shape_list.begin();</span><br><span class="line">              sitr!&#x3D;shape_list.end();sitr++)&#123;</span><br><span class="line">            (*sitr)-&gt;draw();</span><br><span class="line">        &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     if(choice &gt; 0 &amp;&amp; choice &lt; i - 1)&#123;</span><br><span class="line">        &#x2F;&#x2F; add the appropriate shape to the shape list</span><br><span class="line">        shape_list.insert(shape_list.end(),</span><br><span class="line">            factory[shape_names[choice-1]]());</span><br><span class="line">     &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>列表4是可扩展的动态加载库主程序。程序扫描当前目录下的所有so文件（库文件）并打开。这些库会用主程序提供的全局工厂对象注册自身的maker函数。然后，主程序根据库注册过的名字动态地创建形状菜单给用户。通过菜单，用户可以创建各种形状，画形状，或直接退出程序。列表5是用于编译项目的Makefile。</p>
+<p><strong>列表 5.Makefile</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">CC &#x3D; g++</span><br><span class="line">LIBS &#x3D; -ldl</span><br><span class="line">.cc .o:</span><br><span class="line">  $(CC) -ggdb -c $&lt;</span><br><span class="line">default:</span><br><span class="line">  make testdcl</span><br><span class="line">OBJS &#x3D; testdcl.o</span><br><span class="line">testdcl: testdcl.o</span><br><span class="line">  $(CC) -rdynamic -o testdcl testdcl.o $(LIBS)</span><br><span class="line">libcircle.so:  circle.o</span><br><span class="line">  g++ -shared -Wl,-soname,libcircle.so -o libcircle.so circle.o</span><br><span class="line">libsquare.so:  square.o</span><br><span class="line">  g++ -shared -Wl,-soname,libsquare.so -o libsquare.so square.o</span><br><span class="line">all: testdcl libcircle.so libsquare.so</span><br><span class="line">clean:</span><br><span class="line">  rm -f *.so *.o testdcl</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="5-应用案例"><a href="#5-应用案例" class="headerlink" title="5. 应用案例"></a>5. 应用案例</h3><p>最近，本人有用到了这个技术的两个案例。第一个案例，开发移动物体的模拟器。需要在不能访问主要源代码的情况下，让用户添加移动物体的新类型。要完成这个功能，定义了一个entity基础类，这个类提供了模拟移动物体的所有接口。一个简化版的entity定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class entity &#123;</span><br><span class="line">private:</span><br><span class="line">  float xyz[3];  &#x2F;&#x2F; position of theobject</span><br><span class="line">public:</span><br><span class="line">  activate(float)&#x3D;0; &#x2F;&#x2F; tell the object to move</span><br><span class="line">  render()&#x3D;0;  &#x2F;&#x2F; tell the object todraw itself</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>所有的entity都至少有三维坐标，都可以画出自身。大部分entity除了位置之外还有其他的状态变量，同时也不仅仅只有activate函数和render函数，但是这些并不能通过entity接口访问。</p>
+<p>可以根据用户期望的动作来定义新的entity类型。运行时，程序载入子目录Entity下的所有库，使它们在模拟的过程能被调用。</p>
+<p>第二个案例是最近的项目，创建一个能加载/保存多种图片格式的库。这个库要可扩展的，因此我们新建了一个image_handler基类用于加载和保存图片。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class image_handler&#123;</span><br><span class="line">public:</span><br><span class="line">  virtual Image loadImage(char *)&#x3D;0;</span><br><span class="line">  virtual int saveImage(char *, Image &amp;)&#x3D;0;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>image_handler有两个公有函数，分别用于加载和保存图片。Image类是库中图片的基本类型，可以访问图片的数据成员和一些基本的图片操作函数。</p>
+<p>在这个案例中，不关心不同类型的image_handler类的多个对象，只要求image_handler类对象可以加载和保存对应类型的图片。因而只需在库中创建这个handler的单例，而不是给每个handler注册一个maker函数，创建的这个handler指针会注册到一个全局映射里。这个全局映射也不是工厂对象，更像是一个普通的图片加载/保存操作器。这里把文件后缀(tiff, jpg等)作为键。一种图片格式可能会有多种文件名后缀（如tiff，TIFF），因此每个handler可能会在全局映射中注册多次，一个后缀一次。</p>
+<p>解析出文件后缀后，这个库能够让主程序简单地通过来调用正确的处理函数进行图片的载入和保存。</p>
+<p>使用这个库，主程序可以根据文件后缀调用适当的处理函数载入或保存图片。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">map &lt;string, handler,less&lt;string&gt;&gt; handler_map;</span><br><span class="line">char *filename &#x3D;&quot;flower.tiff&quot;;</span><br><span class="line">char ext[MAX_EXT_LEN];</span><br><span class="line">howEverYouWantToParseTheExtensions(filename,ext);</span><br><span class="line">&#x2F;&#x2F; after parsing&quot;flower.tiff&quot; ext &#x3D; &quot;tiff&quot;</span><br><span class="line">Image img1 &#x3D;handler_map[ext]-&gt;loadImage(filename);</span><br><span class="line">&#x2F;&#x2F; process data here</span><br><span class="line">handler_map[ext]-&gt;saveImage(filename,img1);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="6-结论"><a href="#6-结论" class="headerlink" title="6. 结论"></a>6. 结论</h3><p>利用类的动态加载技术可以实现更具扩展性更强健的代码。只要设计出考虑周全的类，运用动态加载类的技术，就能够把扩展代码的实用方法提供给用户。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:wanqiangzhang@sjtu.edu.cn">Bert Zhang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E4%B8%8AC-%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/">https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E4%B8%8AC-%E7%B1%BB%E7%9A%84%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Cpp/">Cpp</a></div><div class="post_share"><div class="social-share" data-image="https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><nav class="pagination_post" id="pagination"><div class="next-post pull-full"><a href="/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"><img class="next_cover" src="https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">[转载]Linux动态库生成与使用指南</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> Recommend</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中分割字符串/" title="[转载]在 C++ 中分割字符串"><img class="relatedPosts_cover" src="https://www.fluentcpp.com/wp-content/uploads/2017/04/how_to_split_string.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中分割字符串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中读取字符串中成对定界符中的子串/" title="[转载]在 C++ 中读取字符串中成对定界符中的子串"><img class="relatedPosts_cover" src="https://cdn.journaldev.com/wp-content/uploads/2020/05/getline_cpp.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中读取字符串中成对定界符中的子串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/19/New-Work-开个新坑/" title="New Work(开个新坑)"><img class="relatedPosts_cover" src="https://images-eu.ssl-images-amazon.com/images/I/41Wk5p4XN8L._SR600%2C315_PIWhiteStrip%2CBottomLeft%2C0%2C35_SCLZZZZZZZ_.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-19</div><div class="relatedPosts_title">New Work(开个新坑)</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/28/转载-C-中虚函数、虚继承内存模型/" title="[转载]C++中虚函数、虚继承内存模型"><img class="relatedPosts_cover" src="https://pic2.zhimg.com/v2-c62704a71918331e08525a0c10704170_1200x500.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-28</div><div class="relatedPosts_title">[转载]C++中虚函数、虚继承内存模型</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/29/typedef-vs-using/" title="typedef vs using"><img class="relatedPosts_cover" src="https://iq.opengenus.org/content/images/2019/06/Untitled-Diagram-2.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-29</div><div class="relatedPosts_title">typedef vs using</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/30/转载-cpp-宏操作/" title="[转载]cpp 宏操作"><img class="relatedPosts_cover" src="https://onevcat.com/assets/images/2014/define-title.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-30</div><div class="relatedPosts_title">[转载]cpp 宏操作</div></div></a></div></div><div class="clear_both"></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 By Bert Zhang</div><div class="framework-info"><span>Driven </span><a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme </span><a href="https://github.com/jerryc127/hexo-theme-butterfly" target="_blank" rel="noopener"><span>Butterfly</span></a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="Read Mode"></i><i class="fa fa-plus" id="font_plus" title="Increase font size"></i><i class="fa fa-minus" id="font_minus" title="Decrease font size"></i><a class="translate_chn_to_cht" id="translateLink" href="javascript:translatePage();" title="Traditional Chinese and Simplified Chinese Conversion" target="_self">繁</a><i class="darkmode fa fa-moon-o" id="darkmode" title="Dark Mode"></i></div><div id="rightside-config-show"><div id="rightside_config" title="Setting"><i class="fa fa-cog" aria-hidden="true"></i></div><i class="fa fa-list-ul close" id="mobile-toc-button" title="Table of Contents" aria-hidden="true"></i><i class="fa fa-arrow-up" id="go-up" title="Back to top" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script></body></html>
