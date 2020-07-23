@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[转载]Linux动态库生成与使用指南 | Bert Zhang</title><meta name="description" content="Linux下动态库文件的文件名形如 libxxx.so，其中so是 Shared Object 的缩写，即可以共享的目标文件。 在链接动态库生成可执行文件时，并不会把动态库的代码复制到执行文件中，而是在执行文件中记录对动态库的引用。 程序执行时，再去加载动态库文件。如果动态库已经加载，则不必重复加载，从而能节省内存空间。 Linux下生成和使用动态库的步骤如下：  编写源文件。 将一个或几个源"><meta name="keywords" content="Cpp"><meta name="author" content="Bert Zhang,wanqiangzhang@sjtu.edu.cn"><meta name="copyright" content="Bert Zhang"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://fonts.googleapis.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="dns-prefetch" href="//busuanzi.ibruce.info"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="[转载]Linux动态库生成与使用指南"><meta name="twitter:description" content="Linux下动态库文件的文件名形如 libxxx.so，其中so是 Shared Object 的缩写，即可以共享的目标文件。 在链接动态库生成可执行文件时，并不会把动态库的代码复制到执行文件中，而是在执行文件中记录对动态库的引用。 程序执行时，再去加载动态库文件。如果动态库已经加载，则不必重复加载，从而能节省内存空间。 Linux下生成和使用动态库的步骤如下：  编写源文件。 将一个或几个源"><meta name="twitter:image" content="https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png"><meta property="og:type" content="article"><meta property="og:title" content="[转载]Linux动态库生成与使用指南"><meta property="og:url" content="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"><meta property="og:site_name" content="Bert Zhang"><meta property="og:description" content="Linux下动态库文件的文件名形如 libxxx.so，其中so是 Shared Object 的缩写，即可以共享的目标文件。 在链接动态库生成可执行文件时，并不会把动态库的代码复制到执行文件中，而是在执行文件中记录对动态库的引用。 程序执行时，再去加载动态库文件。如果动态库已经加载，则不必重复加载，从而能节省内存空间。 Linux下生成和使用动态库的步骤如下：  编写源文件。 将一个或几个源"><meta property="og:image" content="https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png"><meta property="article:published_time" content="2020-07-23T06:41:53.000Z"><meta property="article:modified_time" content="2020-07-23T06:43:20.588Z"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="canonical" href="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"><link rel="next" title="Python模块搜索路径" href="https://bert-z.github.io/2020/07/19/Python%E6%A8%A1%E5%9D%97%E6%90%9C%E7%B4%A2%E8%B7%AF%E5%BE%84/"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"cookieDomain":"https://xxx/","msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  bookmark: {
+    message_prev: 'Press',
+    message_next: 'to bookmark this page'
+  },
+  runtime_unit: 'days',
+  runtime: true,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: true  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 4.2.0"></head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://avatars0.githubusercontent.com/u/33542391?s=460&amp;u=db2ad59370788a7d3c85017aec44089206bd9494&amp;v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">Articles</div><div class="length_num">34</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">Tags</div><div class="length_num">16</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div></div></div><i class="fa fa-arrow-right on" id="toggle-sidebar" aria-hidden="true">     </i><div id="sidebar"><div class="sidebar-toc"><div class="sidebar-toc__title">Catalog</div><div class="sidebar-toc__progress"><span class="progress-notice">You've read</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#编写源文件"><span class="toc-number">1.</span> <span class="toc-text">编写源文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为动态库编写接口文件"><span class="toc-number">2.</span> <span class="toc-text">为动态库编写接口文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#测试，链接动态库生成可执行文件"><span class="toc-number">3.</span> <span class="toc-text">测试，链接动态库生成可执行文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运行"><span class="toc-number">4.</span> <span class="toc-text">运行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#makefile让工作自动化"><span class="toc-number">5.</span> <span class="toc-text">makefile让工作自动化</span></a></li></ol></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">Bert Zhang</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">[转载]Linux动态库生成与使用指南</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date"><span class="post-meta__date-created" title="Created 2020-07-23 06:41:53"><i class="fa fa-calendar" aria-hidden="true"></i> Created 2020-07-23</span><span class="post-meta__separator">|</span><span class="post-meta__date-updated" title="Updated 2020-07-23 06:43:20"><i class="fa fa-history" aria-hidden="true"></i> Updated 2020-07-23</span></time></div><div class="meta-secondline"> </div><div class="meta-thirdline"><span class="post-meta-pv-cv"><i class="fa fa-eye post-meta__icon" aria-hidden="true"> </i><span>Post View:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-commentcount"></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+<p>Linux下动态库文件的文件名形如 <code>libxxx.so</code>，其中so是 Shared Object 的缩写，即可以共享的目标文件。</p>
+<p>在链接动态库生成可执行文件时，并不会把动态库的代码复制到执行文件中，而是在执行文件中记录对动态库的引用。</p>
+<p>程序执行时，再去加载动态库文件。如果动态库已经加载，则不必重复加载，从而能节省内存空间。</p>
+<p>Linux下生成和使用动态库的步骤如下：</p>
+<ol>
+<li>编写源文件。</li>
+<li>将一个或几个源文件编译链接，生成共享库。</li>
+<li>通过 <code>-L&lt;path&gt; -lxxx</code> 的gcc选项链接生成的libxxx.so。</li>
+<li>把libxxx.so放入链接库的标准路径，或指定 <code>LD_LIBRARY_PATH</code>，才能运行链接了libxxx.so的程序。</li>
+</ol>
+<p>下面通过实例详细讲解。</p>
+<h2 id="编写源文件"><a href="#编写源文件" class="headerlink" title="编写源文件"></a>编写源文件</h2><p>建立一个源文件： max.c，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">(<span class="keyword">int</span> n1, <span class="keyword">int</span> n2, <span class="keyword">int</span> n3)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> max_num = n1;</span><br><span class="line">    max_num = max_num &lt; n2? n2: max_num;</span><br><span class="line">    max_num = max_num &lt; n3? n3: max_num;</span><br><span class="line">    <span class="keyword">return</span> max_num;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译生成共享库：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -fPIC -shared -o libmax.so max.c</span><br></pre></td></tr></table></figure>
+
+<p>我们会得到libmax.so。</p>
+<p>实际上上述过程分为编译和链接两步， -fPIC是编译选项，PIC是 Position Independent Code 的缩写，表示要生成位置无关的代码，这是动态库需要的特性； -shared是链接选项，告诉gcc生成动态库而不是可执行文件。</p>
+<p>上述的一行命令等同于：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -c -fPIC max.c</span><br><span class="line">gcc -shared -o libmax.so max.o</span><br></pre></td></tr></table></figure>
+
+<h2 id="为动态库编写接口文件"><a href="#为动态库编写接口文件" class="headerlink" title="为动态库编写接口文件"></a>为动态库编写接口文件</h2><p>为了让用户知道我们的动态库中有哪些接口可用，我们需要编写对应的头文件。</p>
+<p>建立 max.h ，输入以下代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> __MAX_H__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __MAX_H__</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">max</span><span class="params">(<span class="keyword">int</span> n1, <span class="keyword">int</span> n2, <span class="keyword">int</span> n3)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="测试，链接动态库生成可执行文件"><a href="#测试，链接动态库生成可执行文件" class="headerlink" title="测试，链接动态库生成可执行文件"></a>测试，链接动态库生成可执行文件</h2><p>建立一个使用<code>max</code>函数的test.c，代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"max.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">10</span>, b = <span class="number">-2</span>, c = <span class="number">100</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"max among 10, -2 and 100 is %d.\n"</span>, max(a, b, c));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>gcc test.c -L. -lmax</code> 生成a.out，其中<code>-lmax</code>表示要链接<code>libmax.so</code>。<br><code>-L.</code>表示搜索要链接的库文件时包含当前路径。</p>
+<p>注意，如果同一目录下同时存在同名的动态库和静态库，比如 <code>libmax.so</code> 和 <code>libmax.a</code> 都在当前路径下，<br>则gcc会优先链接动态库。</p>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>运行 <code>./a.out</code> 会得到以下的错误提示。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./a.out: error while loading shared libraries: libmax.so: cannot open shared object file: No such file or directory</span><br></pre></td></tr></table></figure>
+
+<p>找不到libmax.so，原来Linux是通过 <code>/etc/ld.so.cache</code> 文件搜寻要链接的动态库的。<br>而 <code>/etc/ld.so.cache</code> 是 ldconfig 程序读取 <code>/etc/ld.so.conf</code> 文件生成的。<br>（注意， <code>/etc/ld.so.conf</code> 中并不必包含 <code>/lib</code> 和 <code>/usr/lib</code>，<code>ldconfig</code>程序会自动搜索这两个目录）</p>
+<p>如果我们把 <code>libmax.so</code> 所在的路径添加到 <code>/etc/ld.so.conf</code> 中，再以root权限运行 <code>ldconfig</code> 程序，更新 <code>/etc/ld.so.cache</code> ，<code>a.out</code>运行时，就可以找到 <code>libmax.so</code>。</p>
+<p>但作为一个简单的测试例子，让我们改动系统的东西，似乎不太合适。<br>还有另一种简单的方法，就是为<code>a.out</code>指定 <code>LD_LIBRARY_PATH</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LD_LIBRARY_PATH=. ./a.out</span><br></pre></td></tr></table></figure>
+
+<p>程序就能正常运行了。<code>LD_LIBRARY_PATH=.</code> 是告诉 <code>a.out</code>，先在当前路径寻找链接的动态库。</p>
+<blockquote>
+<p>对于elf格式的可执行程序，是由ld-linux.so*来完成的，它先后搜索elf文件的 <code>DT_RPATH</code> 段, 环境变量 <code>LD_LIBRARY_PATH</code>, /etc/ld.so.cache文件列表, /lib/,/usr/lib目录, 找到库文件后将其载入内存. (<a href="http://blog.chinaunix.net/uid-23592843-id-223539.html" target="_blank" rel="noopener">http://blog.chinaunix.net/uid-23592843-id-223539.html</a>)</p>
+</blockquote>
+<h2 id="makefile让工作自动化"><a href="#makefile让工作自动化" class="headerlink" title="makefile让工作自动化"></a>makefile让工作自动化</h2><p>编写makefile，内容如下：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: build test clean</span></span><br><span class="line"></span><br><span class="line"><span class="section">build: libmax.so</span></span><br><span class="line"></span><br><span class="line"><span class="section">libmax.so: max.o</span></span><br><span class="line">	gcc -o <span class="variable">$@</span>  -shared <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">max.o: max.c</span></span><br><span class="line">	gcc -c -fPIC <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">test: a.out</span></span><br><span class="line"></span><br><span class="line"><span class="section">a.out: test.c libmax.so</span></span><br><span class="line">	gcc test.c -L. -lmax</span><br><span class="line">	LD_LIBRARY_PATH=. ./a.out</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	rm -f *.o *.so a.out</span><br></pre></td></tr></table></figure>
+
+<p><code>make build</code>就会生成<code>libmax.so</code>， <code>make test</code>就会生成<code>a.out</code>并执行，<code>make clean</code>会清理编译和测试结果。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:wanqiangzhang@sjtu.edu.cn">Bert Zhang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/">https://bert-z.github.io/2020/07/23/%E8%BD%AC%E8%BD%BD-Linux%E5%8A%A8%E6%80%81%E5%BA%93%E7%94%9F%E6%88%90%E4%B8%8E%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Cpp/">Cpp</a></div><div class="post_share"><div class="social-share" data-image="https://images2017.cnblogs.com/blog/1234526/201709/1234526-20170915092632078-926508601.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><nav class="pagination_post" id="pagination"><div class="next-post pull-full"><a href="/2020/07/19/Python%E6%A8%A1%E5%9D%97%E6%90%9C%E7%B4%A2%E8%B7%AF%E5%BE%84/"><img class="next_cover" src="https://nakedsecurity.sophos.com/wp-content/uploads/sites/2/2020/01/pylogo-1200.png?w=780&amp;h=408&amp;crop=1" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Python模块搜索路径</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> Recommend</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中分割字符串/" title="[转载]在 C++ 中分割字符串"><img class="relatedPosts_cover" src="https://www.fluentcpp.com/wp-content/uploads/2017/04/how_to_split_string.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中分割字符串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中读取字符串中成对定界符中的子串/" title="[转载]在 C++ 中读取字符串中成对定界符中的子串"><img class="relatedPosts_cover" src="https://cdn.journaldev.com/wp-content/uploads/2020/05/getline_cpp.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中读取字符串中成对定界符中的子串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/19/New-Work-开个新坑/" title="New Work(开个新坑)"><img class="relatedPosts_cover" src="https://images-eu.ssl-images-amazon.com/images/I/41Wk5p4XN8L._SR600%2C315_PIWhiteStrip%2CBottomLeft%2C0%2C35_SCLZZZZZZZ_.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-19</div><div class="relatedPosts_title">New Work(开个新坑)</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/28/转载-C-中虚函数、虚继承内存模型/" title="[转载]C++中虚函数、虚继承内存模型"><img class="relatedPosts_cover" src="https://pic2.zhimg.com/v2-c62704a71918331e08525a0c10704170_1200x500.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-28</div><div class="relatedPosts_title">[转载]C++中虚函数、虚继承内存模型</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/29/typedef-vs-using/" title="typedef vs using"><img class="relatedPosts_cover" src="https://iq.opengenus.org/content/images/2019/06/Untitled-Diagram-2.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-29</div><div class="relatedPosts_title">typedef vs using</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/30/转载-cpp-宏操作/" title="[转载]cpp 宏操作"><img class="relatedPosts_cover" src="https://onevcat.com/assets/images/2014/define-title.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-30</div><div class="relatedPosts_title">[转载]cpp 宏操作</div></div></a></div></div><div class="clear_both"></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 By Bert Zhang</div><div class="framework-info"><span>Driven </span><a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme </span><a href="https://github.com/jerryc127/hexo-theme-butterfly" target="_blank" rel="noopener"><span>Butterfly</span></a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="Read Mode"></i><i class="fa fa-plus" id="font_plus" title="Increase font size"></i><i class="fa fa-minus" id="font_minus" title="Decrease font size"></i><a class="translate_chn_to_cht" id="translateLink" href="javascript:translatePage();" title="Traditional Chinese and Simplified Chinese Conversion" target="_self">繁</a><i class="darkmode fa fa-moon-o" id="darkmode" title="Dark Mode"></i></div><div id="rightside-config-show"><div id="rightside_config" title="Setting"><i class="fa fa-cog" aria-hidden="true"></i></div><i class="fa fa-list-ul close" id="mobile-toc-button" title="Table of Contents" aria-hidden="true"></i><i class="fa fa-arrow-up" id="go-up" title="Back to top" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script></body></html>
