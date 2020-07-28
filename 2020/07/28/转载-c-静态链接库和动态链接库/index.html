@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[转载]c++ 静态链接库和动态链接库 | Bert Zhang</title><meta name="description" content="什么是库？ 库是写好的现有的，成熟的，可以复用的代码。现实中每个程序都要依赖很多基础的底层库，不可能每个人的代码都从零开始，因此库的存在意义非同寻常。 本质上来说库是一种可执行代码的二进制形式，可以被操作系统载入内存执行。库有两种：静态库（.a、.lib）和动态库（.so、.dll）。  windows上对应的是.lib .dll linux上对应的是.a .so 在这里先介绍下Linux"><meta name="keywords" content="Cpp"><meta name="author" content="Bert Zhang,wanqiangzhang@sjtu.edu.cn"><meta name="copyright" content="Bert Zhang"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://fonts.googleapis.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="dns-prefetch" href="//busuanzi.ibruce.info"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="[转载]c++ 静态链接库和动态链接库"><meta name="twitter:description" content="什么是库？ 库是写好的现有的，成熟的，可以复用的代码。现实中每个程序都要依赖很多基础的底层库，不可能每个人的代码都从零开始，因此库的存在意义非同寻常。 本质上来说库是一种可执行代码的二进制形式，可以被操作系统载入内存执行。库有两种：静态库（.a、.lib）和动态库（.so、.dll）。  windows上对应的是.lib .dll linux上对应的是.a .so 在这里先介绍下Linux"><meta name="twitter:image" content="https://pic4.zhimg.com/50/72b693726d70eea37aacbb93d8d40a43_hd.jpg?source=1940ef5c"><meta property="og:type" content="article"><meta property="og:title" content="[转载]c++ 静态链接库和动态链接库"><meta property="og:url" content="https://bert-z.github.io/2020/07/28/%E8%BD%AC%E8%BD%BD-c-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/"><meta property="og:site_name" content="Bert Zhang"><meta property="og:description" content="什么是库？ 库是写好的现有的，成熟的，可以复用的代码。现实中每个程序都要依赖很多基础的底层库，不可能每个人的代码都从零开始，因此库的存在意义非同寻常。 本质上来说库是一种可执行代码的二进制形式，可以被操作系统载入内存执行。库有两种：静态库（.a、.lib）和动态库（.so、.dll）。  windows上对应的是.lib .dll linux上对应的是.a .so 在这里先介绍下Linux"><meta property="og:image" content="https://pic4.zhimg.com/50/72b693726d70eea37aacbb93d8d40a43_hd.jpg?source=1940ef5c"><meta property="article:published_time" content="2020-07-28T08:14:51.000Z"><meta property="article:modified_time" content="2020-07-28T08:15:13.118Z"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="canonical" href="https://bert-z.github.io/2020/07/28/%E8%BD%AC%E8%BD%BD-c-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/"><link rel="next" title="[转载]c++11: std::bind" href="https://bert-z.github.io/2020/07/28/%E8%BD%AC%E8%BD%BD-c-11-std-bind/"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"cookieDomain":"https://xxx/","msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  bookmark: {
+    message_prev: 'Press',
+    message_next: 'to bookmark this page'
+  },
+  runtime_unit: 'days',
+  runtime: true,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: false  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 4.2.0"></head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://avatars0.githubusercontent.com/u/33542391?s=460&amp;u=db2ad59370788a7d3c85017aec44089206bd9494&amp;v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">Articles</div><div class="length_num">39</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">Tags</div><div class="length_num">17</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://pic4.zhimg.com/50/72b693726d70eea37aacbb93d8d40a43_hd.jpg?source=1940ef5c)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">Bert Zhang</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">[转载]c++ 静态链接库和动态链接库</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date"><span class="post-meta__date-created" title="Created 2020-07-28 08:14:51"><i class="fa fa-calendar" aria-hidden="true"></i> Created 2020-07-28</span><span class="post-meta__separator">|</span><span class="post-meta__date-updated" title="Updated 2020-07-28 08:15:13"><i class="fa fa-history" aria-hidden="true"></i> Updated 2020-07-28</span></time></div><div class="meta-secondline"> </div><div class="meta-thirdline"><span class="post-meta-pv-cv"><i class="fa fa-eye post-meta__icon" aria-hidden="true"> </i><span>Post View:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-commentcount"></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+
+
+<p>什么是库？</p>
+<p>库是写好的现有的，成熟的，可以复用的代码。<strong>现实中每个程序都要依赖很多基础的底层库，不可能每个人的代码都从零开始，因此库的存在意义非同寻常</strong>。</p>
+<p>本质上来说库是一种可执行代码的二进制形式，可以被操作系统载入内存执行。库有两种：静态库（.a、.lib）和动态库（.so、.dll）。  windows上对应的是.lib .dll linux上对应的是.a .so</p>
+<p>在这里先介绍下Linux下的gcc编译的几个选项</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -c hellospeak.cpp</span><br></pre></td></tr></table></figure>
+
+<p>会将hellospeak.cpp  选项 -c 用来告诉编译器编译源代码但不要执行链接，输出结果为对象文件。文件默认名与源码文件名相同，只是将其后缀变为 .o。例如，上面的命令将编译源码文件hellospeak.cpp 并生成对象文件 hellospeak.o；</p>
+<p>下面这条命令将上述两个源码文件编译链接成一个单一的可执行程序： </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ hellospeak.cpp speak.cpp -o hellospeak</span><br></pre></td></tr></table></figure>
+
+<p>如果没有-o和后面的参数，编译器采用默认的 a.out<br>本例中就会生成hellospeak 这样的可执行程序</p>
+<p>所谓静态、动态是指链接。回顾一下，将一个程序编译成可执行程序的步骤：</p>
+<p>图：编译过程</p>
+<p><img src="https://pic4.zhimg.com/50/72b693726d70eea37aacbb93d8d40a43_hd.jpg?source=1940ef5c" alt="img"></p>
+<p>静态库</p>
+<p>之所以成为【静态库】，<strong>是因为在链接阶段，会将汇编生成的目标文件.o与引用到的库一起链接打包到可执行文件中。因此对应的链接方式称为静态链接。</strong></p>
+<p>试想一下，静态库与汇编生成的目标文件一起链接为可执行文件，<strong>那么静态库必定跟<em>.o</em>文件格式相似</strong>。其实一个静态库可以简单看成是一组目标文件（.o/.obj文件）的集合，即很多目标文件经过压缩打包后形成的一个文件。静态库特点总结：</p>
+<p><strong>l  静态库对函数库的链接是放在编译时期完成的。</strong></p>
+<p><strong>l  程序在运行时与函数库再无瓜葛，移植方便。</strong></p>
+<p><strong>l  浪费空间和资源，因为所有相关的目标文件与牵涉到的函数库被链接合成一个可执行文件。</strong></p>
+<p>Linux下创建与使用静态库</p>
+<p>Linux静态库命名规则</p>
+<p>Linux静态库命名规范，必须是”lib[your_library_name].a”：lib为前缀，中间是静态库名，扩展名为.a。</p>
+<p>创建静态库（.a）</p>
+<p>通过上面的流程可以知道，Linux创建静态库过程如下：</p>
+<p>l  首先，将代码文件编译成目标文件.o（StaticMath.o）</p>
+<p><strong>g++ -c StaticMath.cpp</strong></p>
+<p>注意带参数-c，否则直接编译为可执行文件</p>
+<p>l  然后，通过ar工具将目标文件打包成.a静态库文件</p>
+<p><strong>ar -crv libstaticmath.a StaticMath.o</strong></p>
+<p>生成静态库<strong>libstaticmath.a</strong>。</p>
+<p><img src="https://pic4.zhimg.com/80/f798fdffbee291d83ad26a08ed1b28ac_720w.jpg?source=1940ef5c" alt="img"></p>
+<p>——————————-分割线————————</p>
+<p>动态库</p>
+<p>通过上面的介绍发现静态库，容易使用和理解，也达到了代码复用的目的，那为什么还需要动态库呢？</p>
+<p>为什么还需要动态库？</p>
+<p>为什么需要动态库，其实也是静态库的特点导致。</p>
+<p>l  空间浪费是静态库的一个问题。</p>
+<p><img src="https://pic2.zhimg.com/50/6aac2e2dc8faa8d1008f5320a7a83f5d_hd.jpg?source=1940ef5c" alt="img"></p>
+<p>另一个问题是静态库对程序的更新、部署和发布页会带来麻烦。如果静态库liba.lib更新了，所以使用它的应用程序都需要重新编译、发布给用户（对于玩家来说，可能是一个很小的改动，却导致整个程序重新下载，<strong>全量更新</strong>）。</p>
+<p>动态库在程序编译时并不会被连接到目标代码中，而是在程序运行时才被载入。<strong>不同的应用程序如果调用相同的库，那么在内存里只需要有一份该共享库的实例</strong>，规避了空间浪费问题。动态库在程序运行是才被载入，也解决了静态库对程序的更新、部署和发布页会带来麻烦。用户只需要更新动态库即可，<strong>增量更新</strong>。</p>
+<p><img src="https://picb.zhimg.com/80/73f097608fecb37ffc4128273341376e_720w.jpg?source=1940ef5c" alt="img"></p>
+<p>动态库特点总结：</p>
+<p>l  动态库把对一些库函数的链接载入推迟到程序运行的时期。</p>
+<p>l  可以实现进程之间的资源共享。（因此动态库也称为共享库）</p>
+<p>l  将一些程序升级变得简单。</p>
+<p>l  甚至可以真正做到链接载入完全由程序员在程序代码中控制（<strong>显示调用</strong>）。</p>
+<p>Window与Linux执行文件格式不同，在创建动态库的时候有一些差异。</p>
+<p>l  在Windows系统下的执行文件格式是PE格式，动态库需要一个<strong>DllMain</strong>函数做出初始化的入口，通常在导出函数的声明时需要有_declspec(dllexport)<strong>关键字</strong>。</p>
+<p>l  Linux下gcc编译的执行文件默认是ELF格式，<strong>不需要初始化入口，亦不需要函数做特别的声明，</strong>编写比较方便。</p>
+<p>与创建静态库不同的是，不需要打包工具（ar、lib.exe），直接使用编译器即可创建动态库。</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:wanqiangzhang@sjtu.edu.cn">Bert Zhang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://bert-z.github.io/2020/07/28/%E8%BD%AC%E8%BD%BD-c-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/">https://bert-z.github.io/2020/07/28/%E8%BD%AC%E8%BD%BD-c-%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E5%92%8C%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Cpp/">Cpp</a></div><div class="post_share"><div class="social-share" data-image="https://think-async.com/blog/bind-illustrated/bind-plain-function-one-var-zero-args.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><nav class="pagination_post" id="pagination"><div class="next-post pull-full"><a href="/2020/07/28/%E8%BD%AC%E8%BD%BD-c-11-std-bind/"><img class="next_cover" src="https://think-async.com/blog/bind-illustrated/bind-plain-function-one-var-zero-args.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">[转载]c++11: std::bind</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> Recommend</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中分割字符串/" title="[转载]在 C++ 中分割字符串"><img class="relatedPosts_cover" src="https://www.fluentcpp.com/wp-content/uploads/2017/04/how_to_split_string.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中分割字符串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中读取字符串中成对定界符中的子串/" title="[转载]在 C++ 中读取字符串中成对定界符中的子串"><img class="relatedPosts_cover" src="https://cdn.journaldev.com/wp-content/uploads/2020/05/getline_cpp.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中读取字符串中成对定界符中的子串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/19/New-Work-开个新坑/" title="New Work(开个新坑)"><img class="relatedPosts_cover" src="https://images-eu.ssl-images-amazon.com/images/I/41Wk5p4XN8L._SR600%2C315_PIWhiteStrip%2CBottomLeft%2C0%2C35_SCLZZZZZZZ_.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-19</div><div class="relatedPosts_title">New Work(开个新坑)</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/28/转载-C-中虚函数、虚继承内存模型/" title="[转载]C++中虚函数、虚继承内存模型"><img class="relatedPosts_cover" src="https://pic2.zhimg.com/v2-c62704a71918331e08525a0c10704170_1200x500.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-28</div><div class="relatedPosts_title">[转载]C++中虚函数、虚继承内存模型</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/29/typedef-vs-using/" title="typedef vs using"><img class="relatedPosts_cover" src="https://iq.opengenus.org/content/images/2019/06/Untitled-Diagram-2.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-29</div><div class="relatedPosts_title">typedef vs using</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/30/转载-cpp-宏操作/" title="[转载]cpp 宏操作"><img class="relatedPosts_cover" src="https://onevcat.com/assets/images/2014/define-title.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-30</div><div class="relatedPosts_title">[转载]cpp 宏操作</div></div></a></div></div><div class="clear_both"></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 By Bert Zhang</div><div class="framework-info"><span>Driven </span><a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme </span><a href="https://github.com/jerryc127/hexo-theme-butterfly" target="_blank" rel="noopener"><span>Butterfly</span></a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="Read Mode"></i><i class="fa fa-plus" id="font_plus" title="Increase font size"></i><i class="fa fa-minus" id="font_minus" title="Decrease font size"></i><a class="translate_chn_to_cht" id="translateLink" href="javascript:translatePage();" title="Traditional Chinese and Simplified Chinese Conversion" target="_self">繁</a><i class="darkmode fa fa-moon-o" id="darkmode" title="Dark Mode"></i></div><div id="rightside-config-show"><div id="rightside_config" title="Setting"><i class="fa fa-cog" aria-hidden="true"></i></div><i class="fa fa-arrow-up" id="go-up" title="Back to top" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script></body></html>
