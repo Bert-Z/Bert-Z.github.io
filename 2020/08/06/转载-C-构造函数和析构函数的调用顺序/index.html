@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>[转载]C++构造函数和析构函数的调用顺序 | Bert Zhang</title><meta name="description" content="C++如果没有分配资源那么就不一定需要析构函数，否则就需要释放资源，如下： 12345678910class Vector &amp;#123;public:Vector(int s) :elem&amp;#123;new double[s]&amp;#125;, sz&amp;#123;s&amp;#125; &amp;#123; &amp;#125;; &#x2F;&#x2F; constructor: acquire memory˜Vector() &amp;#123;"><meta name="keywords" content="Cpp"><meta name="author" content="Bert Zhang,wanqiangzhang@sjtu.edu.cn"><meta name="copyright" content="Bert Zhang"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="/img/favicon.png"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://fonts.googleapis.com"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="dns-prefetch" href="//busuanzi.ibruce.info"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="[转载]C++构造函数和析构函数的调用顺序"><meta name="twitter:description" content="C++如果没有分配资源那么就不一定需要析构函数，否则就需要释放资源，如下： 12345678910class Vector &amp;#123;public:Vector(int s) :elem&amp;#123;new double[s]&amp;#125;, sz&amp;#123;s&amp;#125; &amp;#123; &amp;#125;; &#x2F;&#x2F; constructor: acquire memory˜Vector() &amp;#123;"><meta name="twitter:image" content="https://images2018.cnblogs.com/blog/1074126/201808/1074126-20180807204732052-1411619377.png"><meta property="og:type" content="article"><meta property="og:title" content="[转载]C++构造函数和析构函数的调用顺序"><meta property="og:url" content="https://bert-z.github.io/2020/08/06/%E8%BD%AC%E8%BD%BD-C-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F/"><meta property="og:site_name" content="Bert Zhang"><meta property="og:description" content="C++如果没有分配资源那么就不一定需要析构函数，否则就需要释放资源，如下： 12345678910class Vector &amp;#123;public:Vector(int s) :elem&amp;#123;new double[s]&amp;#125;, sz&amp;#123;s&amp;#125; &amp;#123; &amp;#125;; &#x2F;&#x2F; constructor: acquire memory˜Vector() &amp;#123;"><meta property="og:image" content="https://images2018.cnblogs.com/blog/1074126/201808/1074126-20180807204732052-1411619377.png"><meta property="article:published_time" content="2020-08-06T15:37:43.000Z"><meta property="article:modified_time" content="2020-08-06T15:38:53.205Z"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="canonical" href="https://bert-z.github.io/2020/08/06/%E8%BD%AC%E8%BD%BD-C-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F/"><link rel="next" title="[转载]图说C++对象模型：对象内存布局详解" href="https://bert-z.github.io/2020/08/06/%E8%BD%AC%E8%BD%BD-%E5%9B%BE%E8%AF%B4C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%EF%BC%9A%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E8%AF%A6%E8%A7%A3/"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"cookieDomain":"https://xxx/","msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  bookmark: {
+    message_prev: 'Press',
+    message_next: 'to bookmark this page'
+  },
+  runtime_unit: 'days',
+  runtime: true,
+  copyright: undefined,
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: undefined,
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: false  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="generator" content="Hexo 4.2.0"></head><body><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://avatars0.githubusercontent.com/u/33542391?s=460&amp;u=db2ad59370788a7d3c85017aec44089206bd9494&amp;v=4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">Articles</div><div class="length_num">47</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">Tags</div><div class="length_num">17</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://images2018.cnblogs.com/blog/1074126/201808/1074126-20180807204732052-1411619377.png)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">Bert Zhang</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">[转载]C++构造函数和析构函数的调用顺序</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date"><span class="post-meta__date-created" title="Created 2020-08-06 15:37:43"><i class="fa fa-calendar" aria-hidden="true"></i> Created 2020-08-06</span><span class="post-meta__separator">|</span><span class="post-meta__date-updated" title="Updated 2020-08-06 15:38:53"><i class="fa fa-history" aria-hidden="true"></i> Updated 2020-08-06</span></time></div><div class="meta-secondline"> </div><div class="meta-thirdline"><span class="post-meta-pv-cv"><i class="fa fa-eye post-meta__icon" aria-hidden="true"> </i><span>Post View:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-commentcount"></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+<p>C++如果没有分配资源那么就不一定需要析构函数，否则就需要释放资源，如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Vector</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">Vector(<span class="keyword">int</span> s) :elem&#123;<span class="keyword">new</span> <span class="keyword">double</span>[s]&#125;, sz&#123;s&#125; &#123; &#125;; <span class="comment">// constructor: acquire memory</span></span><br><span class="line">˜Vector() &#123; <span class="keyword">delete</span>[] elem; &#125; <span class="comment">// destructor: release memory</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line"><span class="keyword">double</span>∗ elem; <span class="comment">// elem points to an array of sz doubles</span></span><br><span class="line"><span class="keyword">int</span> sz; <span class="comment">// sz is non-negative</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>析构函数的调用顺序是从底往上的：<br>[1] first, the constructor invokes its base class constructors,</p>
+<p>首先，是调用该类的基类构造函数<br>[2] then, it invokes the member constructors, and</p>
+<p>然后是该成员类的构造函数（重要记忆，有些书好像没有提到）<br>[3] finally, it executes its own body.</p>
+<p>最后才是本类的构造函数<br>而析构函数的调用顺序刚好是相反</p>
+<p>A destructor ‘‘tears down’’ an object in the reverse order:<br>[1] first, the destructor executes its own body,</p>
+<p>首先调用本类的析构函数<br>[2] then, it invokes its member destructors, and</p>
+<p>然后调用成员类的析构函数<br>[3] finally, it inv okes its base class destructors.</p>
+<p>最后才是基类的析构函数</p>
+<p>特别指出：虚基类是在其他任何类之前调用构造函数的，而在所有其他类之后调用析构函数的。</p>
+<p>这样的调用顺序是为了保证基类或者成员类没有在他们创建之前被调用，或者在析构之后还可能被调用。</p>
+<p>构造函数根据声明顺序，执行成员类和基类的构造函数，而不是根据初始化列表（initializers）顺序。</p>
+<p>没定义构造函数的时候，可以使用默认构造函数，定义了之后就会发生错误了，如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S1</span> &#123;</span></span><br><span class="line"><span class="built_in">string</span> s;</span><br><span class="line">&#125;;</span><br><span class="line">S1 x; <span class="comment">// OK: x.s is initialized to ""</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">X</span> &#123;</span> X(<span class="keyword">int</span>); &#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> &#123;</span></span><br><span class="line">X x;</span><br><span class="line">&#125;;</span><br><span class="line">S2 x1; <span class="comment">// error :</span></span><br><span class="line">S2 x2 &#123;<span class="number">1</span>&#125;; <span class="comment">// OK: x2.x is initialized with 1</span></span><br></pre></td></tr></table></figure>
+
+
+<p>参考：</p>
+<p>The C++ programming language</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:wanqiangzhang@sjtu.edu.cn">Bert Zhang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://bert-z.github.io/2020/08/06/%E8%BD%AC%E8%BD%BD-C-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F/">https://bert-z.github.io/2020/08/06/%E8%BD%AC%E8%BD%BD-C-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Cpp/">Cpp</a></div><div class="post_share"><div class="social-share" data-image="https://images2015.cnblogs.com/blog/610439/201510/610439-20151025200237724-1193009551.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><nav class="pagination_post" id="pagination"><div class="next-post pull-full"><a href="/2020/08/06/%E8%BD%AC%E8%BD%BD-%E5%9B%BE%E8%AF%B4C-%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B%EF%BC%9A%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E8%AF%A6%E8%A7%A3/"><img class="next_cover" src="https://images2015.cnblogs.com/blog/610439/201510/610439-20151025200237724-1193009551.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">[转载]图说C++对象模型：对象内存布局详解</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> Recommend</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中分割字符串/" title="[转载]在 C++ 中分割字符串"><img class="relatedPosts_cover" src="https://www.fluentcpp.com/wp-content/uploads/2017/04/how_to_split_string.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中分割字符串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/15/转载-在-C-中读取字符串中成对定界符中的子串/" title="[转载]在 C++ 中读取字符串中成对定界符中的子串"><img class="relatedPosts_cover" src="https://cdn.journaldev.com/wp-content/uploads/2020/05/getline_cpp.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-15</div><div class="relatedPosts_title">[转载]在 C++ 中读取字符串中成对定界符中的子串</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/19/New-Work-开个新坑/" title="New Work(开个新坑)"><img class="relatedPosts_cover" src="https://images-eu.ssl-images-amazon.com/images/I/41Wk5p4XN8L._SR600%2C315_PIWhiteStrip%2CBottomLeft%2C0%2C35_SCLZZZZZZZ_.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-19</div><div class="relatedPosts_title">New Work(开个新坑)</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/28/转载-C-中虚函数、虚继承内存模型/" title="[转载]C++中虚函数、虚继承内存模型"><img class="relatedPosts_cover" src="https://pic2.zhimg.com/v2-c62704a71918331e08525a0c10704170_1200x500.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-28</div><div class="relatedPosts_title">[转载]C++中虚函数、虚继承内存模型</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/29/typedef-vs-using/" title="typedef vs using"><img class="relatedPosts_cover" src="https://iq.opengenus.org/content/images/2019/06/Untitled-Diagram-2.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-29</div><div class="relatedPosts_title">typedef vs using</div></div></a></div><div class="relatedPosts_item"><a href="/2020/05/30/转载-cpp-宏操作/" title="[转载]cpp 宏操作"><img class="relatedPosts_cover" src="https://onevcat.com/assets/images/2014/define-title.png"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-05-30</div><div class="relatedPosts_title">[转载]cpp 宏操作</div></div></a></div></div><div class="clear_both"></div></div></article></main><footer id="footer" data-type="color"><div id="footer-wrap"><div class="copyright">&copy;2020 By Bert Zhang</div><div class="framework-info"><span>Driven </span><a href="https://hexo.io" target="_blank" rel="noopener"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme </span><a href="https://github.com/jerryc127/hexo-theme-butterfly" target="_blank" rel="noopener"><span>Butterfly</span></a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="Read Mode"></i><i class="fa fa-plus" id="font_plus" title="Increase font size"></i><i class="fa fa-minus" id="font_minus" title="Decrease font size"></i><a class="translate_chn_to_cht" id="translateLink" href="javascript:translatePage();" title="Traditional Chinese and Simplified Chinese Conversion" target="_self">繁</a><i class="darkmode fa fa-moon-o" id="darkmode" title="Dark Mode"></i></div><div id="rightside-config-show"><div id="rightside_config" title="Setting"><i class="fa fa-cog" aria-hidden="true"></i></div><i class="fa fa-arrow-up" id="go-up" title="Back to top" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script></body></html>
