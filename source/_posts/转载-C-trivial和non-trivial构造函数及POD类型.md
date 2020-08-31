@@ -85,3 +85,5 @@ template <class T> void copy(T* source, T* destination, int n, __false_type)
 ```
 
 当然实际的copy比这个复杂多了，有非常多的特化等，这个只是其中一方面而已。
+
+**用户自定义型别，都被编译器视为拥有non-trivial ctor/dtor/operator=。如果我们确知某个class具备的是trivial ctor/dtor/operator=，就得自己动手为它做特性设定，才能保证编译器知道它的身份。**
